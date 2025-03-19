@@ -1,18 +1,16 @@
 import { dateTimeScalar, Time } from "./scalar.js";
-import {
-  ClientModel,
-  RoleModel,
-  StaffMemberModel,
-  BusinessModel,
-  CategoryModel,
-  SubcategoryModel,
-  ProductModel,
-  VariantModel,
-  InventoryModel,
-  OrderModel,
-  OnlineOrderModel,
-} from "./models.js";
+import { OnlineOrderModel } from "./models/OnlineOrder.js";
+import { OrderModel } from "./models/Order.js";
+import { ProductModel } from "./models/Product.js";
+import { VariantModel } from "./models/Variant.js";
+import { InventoryModel } from "./models/Inventory.js";
+import { BusinessModel } from "./models/Business.js";
+import { CategoryModel } from "./models/Category.js";
+import { SubcategoryModel } from "./models/Subcategory.js";
+import { RoleModel } from "./models/Role.js";
 import { SubscriptionPlanModel } from "./models/SubscriptionPlan.js";
+import { ClientModel } from "./models/Client.js";
+import { StaffMemberModel } from "./models/StaffMember.js";
 export const resolvers = {
   DateTime: dateTimeScalar,
   Time: Time,
@@ -28,10 +26,10 @@ export const resolvers = {
 
     // Client Queries
     clients: async () => {
-      return await ClientModel.find();
+      return await ClientModel.find({}).populate("subscriptionPlan");
     },
     client: async (_: any, { id }: { id: string }) => {
-      return await ClientModel.findById(id);
+      return await ClientModel.findById(id).populate("subscriptionPlan");
     },
 
     // Role Queries
@@ -44,18 +42,44 @@ export const resolvers = {
 
     // StaffMember Queries
     staffMembers: async () => {
-      return await StaffMemberModel.find();
+      return await StaffMemberModel.find().populate("role").populate("client");
     },
     staffMember: async (_: any, { id }: { id: string }) => {
-      return await StaffMemberModel.findById(id);
+      return await StaffMemberModel.findById(id)
+        .populate("role")
+        .populate("client");
     },
 
     // Business Queries
     businesses: async () => {
-      return await BusinessModel.find();
+      try {
+        const businesses = await BusinessModel.find()
+          .populate("owner")
+          .populate("categories")
+          .populate("subcategories");
+
+        return businesses;
+      } catch (error) {
+        console.error("Error fetching businesses:", error);
+        throw new Error("Failed to fetch businesses");
+      }
     },
     business: async (_: any, { id }: { id: string }) => {
-      return await BusinessModel.findById(id);
+      try {
+        const business = await BusinessModel.findById(id)
+          .populate("owner")
+          .populate("categories")
+          .populate("subcategories");
+
+        if (!business) {
+          throw new Error("Business not found");
+        }
+
+        return business;
+      } catch (error) {
+        console.error("Error fetching business:", error);
+        throw new Error("Failed to fetch business");
+      }
     },
 
     // Category Queries
@@ -142,8 +166,34 @@ export const resolvers = {
 
     // Client Mutations
     createClient: async (_: any, { input }: { input: any }) => {
-      const newClient = new ClientModel(input);
-      return await newClient.save();
+      try {
+        // Validate that the subscriptionPlan exists
+        const subscriptionPlan = await SubscriptionPlanModel.findById(
+          input.subscriptionPlan
+        );
+        if (!subscriptionPlan) {
+          throw new Error("SubscriptionPlan not found");
+        }
+
+        // Create the new client
+        const newClient = new ClientModel({
+          ...input,
+          subscriptionPlan: input.subscriptionPlan, // Ensure this is a valid ObjectId
+        });
+
+        // Save the client
+        const savedClient = await newClient.save();
+
+        // Populate the subscriptionPlan field
+        const populatedClient = await ClientModel.findById(
+          savedClient._id
+        ).populate("subscriptionPlan");
+
+        return populatedClient;
+      } catch (error) {
+        console.error("Error creating client:", error);
+        throw new Error(`Failed to create client: ${error.message}`);
+      }
     },
     updateClient: async (_: any, { id, input }: { id: string; input: any }) => {
       return await ClientModel.findByIdAndUpdate(id, input, { new: true });
@@ -168,8 +218,43 @@ export const resolvers = {
 
     // StaffMember Mutations
     createStaffMember: async (_: any, { input }: { input: any }) => {
-      const newStaffMember = new StaffMemberModel(input);
-      return await newStaffMember.save();
+      try {
+        // Validate that the role exists
+        const role = await RoleModel.findById(input.roleId);
+        if (!role) {
+          throw new Error("Role not found");
+        }
+
+        // Validate that the client exists
+        const client = await ClientModel.findById(input.clientId);
+        if (!client) {
+          throw new Error("Client not found");
+        }
+
+        // Create the new staff member
+        const newStaffMember = new StaffMemberModel({
+          username: input.username,
+          password: input.password,
+          role: input.roleId, // Map roleId to role
+          client: input.clientId, // Map clientId to client
+          isActive: input.isActive,
+        });
+
+        // Save the staff member
+        const savedStaffMember = await newStaffMember.save();
+
+        // Populate the role and client fields
+        const populatedStaffMember = await StaffMemberModel.findById(
+          savedStaffMember._id
+        )
+          .populate("role")
+          .populate("client");
+
+        return populatedStaffMember;
+      } catch (error) {
+        console.error("Error creating staff member:", error);
+        throw new Error(`Failed to create staff member: ${error.message}`);
+      }
     },
     updateStaffMember: async (
       _: any,
@@ -184,14 +269,139 @@ export const resolvers = {
 
     // Business Mutations
     createBusiness: async (_: any, { input }: { input: any }) => {
-      const newBusiness = new BusinessModel(input);
-      return await newBusiness.save();
+      try {
+        // Destructure input fields
+        const {
+          ownerId,
+          categoryIds,
+          subcategoryIds,
+          address,
+          socialMedia,
+          ...rest
+        } = input;
+
+        // Validate that the owner exists
+        const owner = await ClientModel.findById(ownerId);
+        if (!owner) {
+          throw new Error("Owner not found");
+        }
+
+        // Validate that the categories exist (if provided)
+        if (categoryIds && categoryIds.length > 0) {
+          const categories = await CategoryModel.find({
+            _id: { $in: categoryIds },
+          });
+          if (categories.length !== categoryIds.length) {
+            throw new Error("One or more categories not found");
+          }
+        }
+
+        // Validate that the subcategories exist (if provided)
+        if (subcategoryIds && subcategoryIds.length > 0) {
+          const subcategories = await SubcategoryModel.find({
+            _id: { $in: subcategoryIds },
+          });
+          if (subcategories.length !== subcategoryIds.length) {
+            throw new Error("One or more subcategories not found");
+          }
+        }
+
+        // Create the new business
+        const newBusiness = new BusinessModel({
+          ...rest,
+          owner: ownerId,
+          address: {
+            house: address.house,
+            street: address.street,
+            city: address.city,
+            state: address.state,
+            postalCode: address.postalCode,
+            country: address.country,
+          },
+          socialMedia: {
+            facebook: socialMedia?.facebook,
+            instagram: socialMedia?.instagram,
+          },
+          categories: categoryIds || [],
+          subcategories: subcategoryIds || [],
+        });
+
+        // Save the business
+        const savedBusiness = await newBusiness.save();
+
+        // Populate all fields
+        const populatedBusiness = await BusinessModel.findById(
+          savedBusiness._id
+        )
+          .populate("owner")
+          .populate("categories")
+          .populate("subcategories");
+
+        return populatedBusiness;
+      } catch (error) {
+        console.error("Error creating business:", error);
+        throw new Error(`Failed to create business: ${error.message}`);
+      }
     },
     updateBusiness: async (
       _: any,
       { id, input }: { id: string; input: any }
     ) => {
-      return await BusinessModel.findByIdAndUpdate(id, input, { new: true });
+      try {
+        // Validate that the business exists
+        const business = await BusinessModel.findById(id);
+        if (!business) {
+          throw new Error("Business not found");
+        }
+
+        // Validate that the owner exists (if ownerId is provided)
+        if (input.ownerId) {
+          const owner = await ClientModel.findById(input.ownerId);
+          if (!owner) {
+            throw new Error("Owner not found");
+          }
+        }
+
+        // Validate that the categories exist (if categoryIds is provided)
+        if (input.categoryIds) {
+          const categories = await CategoryModel.find({
+            _id: { $in: input.categoryIds },
+          });
+          if (categories.length !== input.categoryIds.length) {
+            throw new Error("One or more categories not found");
+          }
+        }
+
+        // Validate that the subcategories exist (if subcategoryIds is provided)
+        if (input.subcategoryIds) {
+          const subcategories = await SubcategoryModel.find({
+            _id: { $in: input.subcategoryIds },
+          });
+          if (subcategories.length !== input.subcategoryIds.length) {
+            throw new Error("One or more subcategories not found");
+          }
+        }
+
+        // Update the business
+        const updatedBusiness = await BusinessModel.findByIdAndUpdate(
+          id,
+          {
+            ...input,
+            owner: input.ownerId,
+            categories: input.categoryIds,
+            subcategories: input.subcategoryIds,
+          },
+          { new: true }
+        )
+          .populate("owner")
+          .populate("categories")
+          .populate("subcategories");
+
+        return updatedBusiness;
+      } catch (error) {
+        console.error("Error updating business:", error);
+        throw new Error(`Failed to update business: ${error.message}`);
+      }
     },
     deleteBusiness: async (_: any, { id }: { id: string }) => {
       await BusinessModel.findByIdAndDelete(id);

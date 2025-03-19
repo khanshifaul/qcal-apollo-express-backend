@@ -26,9 +26,9 @@ type Client {
   phone: String!
   password: String!
   subscriptionPlan: SubscriptionPlan!
-  businesses: [Business!]!
+  businesses: [Business!]
   isAdmin: Boolean!
-  staffMembers: [StaffMember!]!
+  staffMembers: [StaffMember!]
   createdAt: DateTime!
   updatedAt: DateTime!
   lastLogin: DateTime
@@ -37,6 +37,8 @@ type Client {
 type Role {
   id: ID!
   name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type StaffMember {
@@ -45,7 +47,7 @@ type StaffMember {
   password: String!
   role: Role!
   client: Client!
-  assignedBusinesses: [Business!]!
+  assignedBusinesses: [Business!]
   isActive: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -55,16 +57,16 @@ type StaffMember {
 type Business {
   id: ID!
   name: String!
-  owner: Client
+  owner: Client!
   address: Address!
   phone: String!
   email: String!
   website: String
   logo: String!
   socialMedia: SocialMedia
-  categories: [Category!]!
-  subcategories: [Subcategory!]!
-  products: [Product!]!
+  categories: [Category!]
+  subcategories: [Subcategory!]
+  products: [Product!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -91,6 +93,8 @@ type Category {
   image: String
   subcategories: [Subcategory!]
   products: [Product!]
+  client: Client!
+  business: [Business!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -102,7 +106,9 @@ type Subcategory {
   description: String
   image: String
   category: Category!
-  products: [Product!]!
+  client: Client!
+  business: [Business!]
+  products: [Product!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -127,6 +133,7 @@ type Product {
   basePrice: Money!
   category: Category!
   subcategory: Subcategory!
+  client: Client!
   business: Business!
   hasVariants: Boolean!
   variants: [Variant!]
@@ -149,6 +156,7 @@ enum VariantStatus {
 type Variant {
   id: ID!
   name: String!
+  product: Product!
   sku: String!
   images: [String!]
   buyingPrice: Money!
@@ -180,6 +188,8 @@ type Inventory {
   id: ID!
   name: String!
   type: InventoryType!
+  client: Client!
+  business: Business
   address: Address!
   contact: String!
   createdAt: DateTime!
@@ -191,7 +201,9 @@ type Customer {
   phone: String!
   email: String
   address: String!
-  facebookid: String
+  facebook: String
+  client: Client!
+  business: [Business!]
 }
 
 enum PaymentMethod {
@@ -395,7 +407,7 @@ input ClientInput {
   email: String!
   phone: String!
   password: String!
-  subscriptionPlanId: ID!
+  subscriptionPlan: ID!
   isAdmin: Boolean
 }
 
@@ -413,15 +425,15 @@ input StaffMemberInput {
 
 input BusinessInput {
   name: String!
-  ownerId: ID
+  ownerId: ID!
   address: AddressInput!
   phone: String!
   email: String!
   website: String
   logo: String!
   socialMedia: SocialMediaInput
-  categoryIds: [ID!]!
-  subcategoryIds: [ID!]!
+  categoryIds: [ID!]
+  subcategoryIds: [ID!]
 }
 
 input AddressInput {
