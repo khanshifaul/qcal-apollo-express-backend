@@ -1,0 +1,30 @@
+{
+  "name": "qcal-apollo-express-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js",
+    "dev": "nodemon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@apollo/server": "^4.11.3",
+    "@types/multer": "^1.4.12",
+    "cloudinary": "^2.6.0",
+    "dotenv": "^16.4.7",
+    "graphql": "^16.10.0",
+    "mongoose": "^8.12.1",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}

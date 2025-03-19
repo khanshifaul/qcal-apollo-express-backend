@@ -1,0 +1,280 @@
+{
+  "subscriptionPlans": [
+    {
+      "id": "1",
+      "tier": "Free",
+      "features": ["Basic Features", "Limited Support"],
+      "priceAmount": 0,
+      "priceCurrency": "USD",
+      "interval": "MONTHLY",
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z",
+      "trialPeriodDays": 7
+    },
+    {
+      "id": "2",
+      "tier": "Standard",
+      "features": ["Advanced Features", "Email Support"],
+      "priceAmount": 9.99,
+      "priceCurrency": "USD",
+      "interval": "MONTHLY",
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z",
+      "trialPeriodDays": 14
+    },
+    {
+      "id": "3",
+      "tier": "Premium",
+      "features": ["All Features", "24/7 Support"],
+      "priceAmount": 29.99,
+      "priceCurrency": "USD",
+      "interval": "MONTHLY",
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z",
+      "trialPeriodDays": 30
+    }
+  ],
+  "clients": [
+    {
+      "id": "1",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "password": "password123",
+      "subscriptionPlan": "1",
+      "isAdmin": true,
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z",
+      "lastLogin": "2023-10-05T12:00:00Z",
+      "businesses": [
+        {
+          "id": "1",
+          "name": "Tech Gadgets Inc.",
+          "owner": "1",
+          "address": {
+            "house": "123",
+            "street": "Tech Street",
+            "city": "San Francisco",
+            "state": "CA",
+            "postalCode": "94105",
+            "country": "USA"
+          },
+          "phone": "+1234567890",
+          "email": "info@techgadgets.com",
+          "website": "https://techgadgets.com",
+          "logo": "https://techgadgets.com/logo.png",
+          "socialMedia": {
+            "facebook": "https://facebook.com/techgadgets",
+            "instagram": "https://instagram.com/techgadgets"
+          },
+          "categories": ["1"],
+          "subcategories": ["1", "2"],
+          "products": ["1", "2"],
+          "createdAt": "2023-10-01T00:00:00Z",
+          "updatedAt": "2023-10-01T00:00:00Z"
+        }
+      ],
+      "staffMembers": [
+        {
+          "id": "1",
+          "username": "jane_tech",
+          "password": "staff123",
+          "role": {
+            "id": "1",
+            "name": "Manager"
+          },
+          "client": "1",
+          "assignedBusinesses": ["1"],
+          "isActive": true,
+          "createdAt": "2023-10-01T00:00:00Z",
+          "updatedAt": "2023-10-01T00:00:00Z",
+          "lastLogin": "2023-10-05T12:00:00Z"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Electronics",
+      "slug": "electronics",
+      "description": "All electronic gadgets and devices",
+      "image": "https://example.com/electronics.jpg",
+      "subcategories": ["1", "2"],
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z"
+    }
+  ],
+  "subcategories": [
+    {
+      "id": "1",
+      "name": "Smartphones",
+      "slug": "smartphones",
+      "description": "Latest smartphones and accessories",
+      "image": "https://example.com/smartphones.jpg",
+      "category": "1",
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z"
+    },
+    {
+      "id": "2",
+      "name": "Laptops",
+      "slug": "laptops",
+      "description": "High-performance laptops",
+      "image": "https://example.com/laptops.jpg",
+      "category": "1",
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "name": "Smartphone X",
+      "slug": "smartphone-x",
+      "description": "Latest smartphone with advanced features",
+      "basePrice": {
+        "amount": 699.99,
+        "currency": "USD"
+      },
+      "category": "1",
+      "subcategory": "1",
+      "business": "1",
+      "hasVariants": true,
+      "variants": [
+        {
+          "id": "1",
+          "name": "128GB Black",
+          "sku": "SMX128BLK",
+          "images": ["https://example.com/smartphone-x-black.jpg"],
+          "buyingPrice": {
+            "amount": 500.00,
+            "currency": "USD"
+          },
+          "sellingPrice": {
+            "amount": 699.99,
+            "currency": "USD"
+          },
+          "discountType": "PERCENTAGE",
+          "discountValue": 10,
+          "saleStart": "2023-10-01T00:00:00Z",
+          "saleEnd": "2023-12-31T00:00:00Z",
+          "stock": [
+            {
+              "location": {
+                "id": "1",
+                "name": "Warehouse A",
+                "type": "WAREHOUSE",
+                "address": {
+                  "house": "123",
+                  "street": "Warehouse Street",
+                  "city": "San Francisco",
+                  "state": "CA",
+                  "postalCode": "94105",
+                  "country": "USA"
+                },
+                "contact": "+1234567890",
+                "createdAt": "2023-10-01T00:00:00Z",
+                "updatedAt": "2023-10-01T00:00:00Z"
+              },
+              "quantity": 100,
+              "lowStockThreshold": 10,
+              "lastRestocked": "2023-10-01T00:00:00Z"
+            }
+          ],
+          "status": "ACTIVE",
+          "createdAt": "2023-10-01T00:00:00Z",
+          "updatedAt": "2023-10-01T00:00:00Z"
+        }
+      ],
+      "status": "ACTIVE",
+      "trackInventory": true,
+      "createdAt": "2023-10-01T00:00:00Z",
+      "updatedAt": "2023-10-01T00:00:00Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "1",
+      "client": "1",
+      "business": "1",
+      "customer": {
+        "name": "Alice",
+        "phone": "+1111111111",
+        "email": "alice@example.com",
+        "address": "123 Main St, City, Country"
+      },
+      "items": [
+        {
+          "product": "1",
+          "variant": "1",
+          "quantity": 2,
+          "price": {
+            "amount": 699.99,
+            "currency": "USD"
+          },
+          "subTotal": {
+            "amount": 1399.98,
+            "currency": "USD"
+          }
+        }
+      ],
+      "paymentMethod": "CREDIT_CARD",
+      "orderStatus": "DELIVERED",
+      "itemTotal": {
+        "amount": 1399.98,
+        "currency": "USD"
+      },
+      "codAmount": {
+        "amount": 0,
+        "currency": "USD"
+      },
+      "advanceAmount": {
+        "amount": 0,
+        "currency": "USD"
+      },
+      "discountAmount": {
+        "amount": 0,
+        "currency": "USD"
+      },
+      "deliveryZone": "DhakaCity",
+      "deliveryCharge": {
+        "Zone": "DhakaCity",
+        "chargeAmount": {
+          "amount": 10.00,
+          "currency": "USD"
+        },
+        "createdAt": "2023-10-01T00:00:00Z",
+        "updatedAt": "2023-10-01T00:00:00Z"
+      },
+      "total": {
+        "amount": 1409.98,
+        "currency": "USD"
+      },
+      "courier": {
+        "id": "1",
+        "name": "Fast Delivery",
+        "apiKey": "fastdelivery123",
+        "apiSecret": "fastdeliverysecret123",
+        "createdAt": "2023-10-01T00:00:00Z",
+        "updatedAt": "2023-10-01T00:00:00Z"
+      },
+      "trackingNumber": "FD123456789",
+      "trackingUrl": "https://fastdelivery.com/track/FD123456789",
+      "source": "WEBSITE",
+      "notes": "Handle with care",
+      "address": "123 Main St, City, Country",
+      "status": "DELIVERED",
+      "estimatedDelivery": "2023-10-05T00:00:00Z",
+      "actualDelivery": "2023-10-05T12:00:00Z",
+      "isScheduled": false,
+      "createdBy": {
+        "id": "1",
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      "createdAt": "2023-10-02T00:00:00Z",
+      "updatedAt": "2023-10-02T00:00:00Z"
+    }
+  ]
+}
